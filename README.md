@@ -9,8 +9,8 @@ from rdkit.Chem import AllChem, Descriptors
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, cohen_kappa_score, matthews_corrcoef, \
-    recall_score, f1_score
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, \
+cohen_kappa_score, matthews_corrcoef, recall_score, f1_score
 from sklearn.externals import joblib
 import csv
 from imblearn.over_sampling import RandomOverSampler
