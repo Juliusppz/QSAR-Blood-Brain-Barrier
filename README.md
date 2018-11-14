@@ -2,6 +2,7 @@
 # This is an example of a quantitative structure-activity relationship (QSAR) model. It is build to predict the probability of a substance being able to pass the blood-brain barrier (BBB) using Morgan fingerprints and a number of hand-picked descriptors. The input consists of molecular structures in SMILES format and a random forest is used as a binary classification model. The best hyperparameters are determined by a grid search and the model is validated using 10-fold cross-validation. In the end it is tested on a separate set and used to infer the behavior of unlabeled data.
 
 # Use numpy for handling the data arrays, rdkit to generate the fingerprints as input for the models and sklearn to implement the models. csv is used to read the SMILES strings from the data files and imblearn offers a simple way to restore the class balance (in this case using random oversampling).
+```
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
@@ -13,7 +14,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, c
 from sklearn.externals import joblib
 import csv
 from imblearn.over_sampling import RandomOverSampler
-
+```
 
 #if __name__ == '__main__': # protect for joblib when running on windows
 
