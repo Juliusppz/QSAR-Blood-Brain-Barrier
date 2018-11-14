@@ -1,6 +1,7 @@
-# QSAR-Blood-Brain-Barrier
+# QSAR: Predicting Blood-Brain Barrier Passage
 This is an example of a quantitative structure-activity relationship (QSAR) model. It is build to predict the probability of a substance being able to pass the blood-brain barrier (BBB) using Morgan fingerprints and a number of hand-picked descriptors. The input consists of molecular structures in SMILES format and a random forest is used as a binary classification model. The best hyperparameters are determined by a grid search and the model is validated using 10-fold cross-validation. In the end it is tested on a separate set and used to infer the behavior of unlabeled data.
 
+## Implementation
 Numpy is used for handling the data arrays, rdkit for generating the fingerprints as input for the models and sklearn for implementing the models. csv is used to read the SMILES strings from the data files and imblearn offers a simple way to restore the class balance (in this case using random oversampling).
 ```
 import numpy as np
@@ -16,9 +17,9 @@ import csv
 from imblearn.over_sampling import RandomOverSampler
 ```
 
-#if __name__ == '__main__': # protect for joblib when running on windows
+If the code is to be run on Windows, the main loop has to be protected for parallel execution by joblib. This can be done by running everything after the imports within `if __name__ == '__main__':`
 
-# First, the raw training data is loaded and stored in numpy arrays.
+First, the raw training data is loaded and stored in numpy arrays.
 ```
 with open('data/bbb_train.csv', newline='') as csvfile:
     molprediction = csv.reader(csvfile, delimiter=',')
