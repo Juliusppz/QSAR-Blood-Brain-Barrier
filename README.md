@@ -81,7 +81,7 @@ Here one can take a quick look at the data balance to decide how to proceed furt
 print("ratio: " + str(sum(ytraindata) / len(ytraindata)))  
 ```
 
-## Model Generation and Training
+## Model Setup and Training
 The training data is split into the actual training set and a test set. The test set will later be used in addition to validation to test the generality of the model. A 10-fold stratified cross-validation is chosen, the training data is randomly oversampled to restore balance and the training data is scaled to unit variance (after the mean is removed). The scale is stored for later use. Note that the scaling is not required in this case, since we are working with a random forest model. However, for other models this preprocessing step is important.
 ```
 randomseed = 789 
