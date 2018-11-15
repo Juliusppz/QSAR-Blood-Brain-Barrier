@@ -82,7 +82,7 @@ print("ratio: " + str(sum(ytraindata) / len(ytraindata)))
 
 The training data is split into the actual training set and a test set. The test set will later be used in addition to validation to test the generality of the model. A 10-fold stratified cross-validation is chosen, the training data is randomly oversampled to restore balance and the training data is scaled to unit variance (after the mean is removed). The scale is stored for later use. Note that the scaling is not required in this case, since we are working with a random forest model. However, for other models this preprocessing step is important.
 ```
-randomseed = 789 # Working with a seed for the random numbers is useful to reproduce results during implementation, but should not affect the overall quality of the model.
+randomseed = 789 
 
 x_train, x_test, y_train, y_test = train_test_split(xtraindata, ytraindata, test_size=0.25, random_state=randomseed,
                                                     stratify=ytraindata)  
