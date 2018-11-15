@@ -17,7 +17,7 @@ import csv
 from imblearn.over_sampling import RandomOverSampler
 ```
 
-If the code is to be run on Windows, the main loop has to be protected for parallel execution by joblib. This can be done by running everything after the imports within `if __name__ == '__main__':`
+If the code is to be run on Windows, the main loop has to be protected for parallel execution by joblib. This can be done by running everything after the imports within `if __name__ == '__main__':`.
 
 First, the raw training data is loaded and stored in numpy arrays.
 ```
@@ -31,7 +31,7 @@ ytraindata = train[1:, 1]
 ytraindata = ytraindata.astype(int)
 ```
 
-# Next, the SMILES strings that represent the molecules in the "x" component of the training data are converted into rdkit molecule objects. Using those, certain descriptors and Morgen fingerprints are calculated and are later used to train this model.
+Next, the SMILES strings that represent the molecules in the "x" component of the training data are converted into rdkit molecule objects. Using those, certain descriptors and Morgen fingerprints are calculated and are later used to train this model.
 ```
 moltraindata = [Chem.MolFromSmiles(mol) for mol in moltraindata]  # get rdkit mol object
 
@@ -50,7 +50,7 @@ xtraindata = np.concatenate((xtraindata, descriptors),
                             axis=1)  # build x training data from fingerprints and some descriptors
 ```
 
-# Now the final test data is loaded in the same way as the training data and after training the model, their classes will be inferred. These could be the predictions for new molecules, one is interested in examining in the future.
+Now the final test data is loaded in the same way as the training data and after training the model, their classes will be inferred. These could be the predictions for new molecules, one is interested in examining in the future.
 ```
 with open('data/bbb_test.csv', newline='') as csvfile:
     moltest = csv.reader(csvfile, delimiter=',')
@@ -75,12 +75,12 @@ x_final_test = np.array(testfptraindata)
 x_final_test = np.concatenate((x_final_test, testdescriptors), axis=1)  # get x test data ready
 ```
 
-# Here one can take a quick look at the data balance to decide how to proceed further. In this case the data is significantly unbalanced.
+Here one can take a quick look at the data balance to decide how to proceed further. In this case the data is significantly unbalanced.
 ```
 print("ratio: " + str(sum(ytraindata) / len(ytraindata)))  # take a look at the data balance
 ```
 
-# The training data is split into the actual training set and a test set. The test set will later be used in addition to validation to test the generality of the model. A 10-fold stratified cross-validation is chosen, the training data is randomly oversampled to restore balance and the training data is scaled to unit variance (after the mean is removed). The scale is stored for later use. Note that the scaling is not required in this case, since we are working with a random forest model. However, for other models this preprocessing step is important.
+The training data is split into the actual training set and a test set. The test set will later be used in addition to validation to test the generality of the model. A 10-fold stratified cross-validation is chosen, the training data is randomly oversampled to restore balance and the training data is scaled to unit variance (after the mean is removed). The scale is stored for later use. Note that the scaling is not required in this case, since we are working with a random forest model. However, for other models this preprocessing step is important.
 ```
 randomseed = 789 # Working with a seed for the random numbers is useful to reproduce results during implementation, but should not affect the overall quality of the model.
 
@@ -96,7 +96,7 @@ x_train = scaler.transform(x_train)
 joblib.dump(scaler, "mydata/scale_morgan1.pkl", compress=3)
 ```
 
-# A grid of hyperparameters in terms of the number of decision trees and their maximum number of features is constructed and for each combination a model is generated. After training the models are saved.
+A grid of hyperparameters in terms of the number of decision trees and their maximum number of features is constructed and for each combination a model is generated. After training the models are saved.
 ```
 paramgrid = {
     "max_features": [x_train.shape[1] // 20, x_train.shape[1] // 15, x_train.shape[1] // 10, x_train.shape[1] // 5],
@@ -107,7 +107,7 @@ m_rf.fit(x_train, y_train)
 joblib.dump(m_rf, "mydata/model_morgan1_rf.pkl", compress=3)
 ```
 
-# The scale and the models are loaded and a number of performance metrics of the models are examined using the test data set.
+The scale and the models are loaded and a number of performance metrics of the models are examined using the test data set.
 ```
 scaler = joblib.load("mydata/scale_morgan1.pkl")
 m_rf = joblib.load("mydata/model_morgan1_rf.pkl")
@@ -127,7 +127,7 @@ print("conf. matrix: " + str(confusion_matrix(y_test, pred_rf)))
 print("matth. cor.: " + str(matthews_corrcoef(y_test, pred_rf)))
 ```
 
-# The input data for the final predictions is scaled like the training data and their ability to pass the blood brain barrier is inferred from the best model. It can be seen that the ratio for this test set is different than for the training set, which indicates that this data does not come from the same distribution as the training data.
+The input data for the final predictions is scaled like the training data and their ability to pass the blood brain barrier is inferred from the best model. It can be seen that the ratio for this test set is different than for the training set, which indicates that this data does not come from the same distribution as the training data.
 ```
 x_final_test = scaler.transform(x_final_test)
 pred_rf_test = m_rf.predict(x_final_test)
@@ -135,7 +135,7 @@ pred_rf_test = m_rf.predict(x_final_test)
 print("testratio: " + str(sum(pred_rf_test) / len(pred_rf_test)))  
 ```
 
-# In the last step, the predictions are brought to the same format as the training data and is written to a file.
+In the last step, the predictions are brought to the same format as the training data and is written to a file.
 ```
 moltmp = np.array(testdata)  # get results ready
 pred_rf_test = np.concatenate(([moltmp[1:, 0]], pred_rf_test[:, None].T), axis=0)
