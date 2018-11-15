@@ -23,7 +23,7 @@ First, the raw training data is loaded and stored in numpy arrays.
 ```
 with open('data/bbb_train.csv', newline='') as csvfile:
     molprediction = csv.reader(csvfile, delimiter=',')
-    train = list(molprediction)  # read training file
+    train = list(molprediction)  
 
 train = np.array(train)
 moltraindata = train[1:, 0]
@@ -33,7 +33,7 @@ ytraindata = ytraindata.astype(int)
 
 Next, the SMILES strings that represent the molecules in the "x" component of the training data are converted into rdkit molecule objects. Using those, certain descriptors and Morgen fingerprints are calculated and are later used to train this model.
 ```
-moltraindata = [Chem.MolFromSmiles(mol) for mol in moltraindata]  # get rdkit mol object
+moltraindata = [Chem.MolFromSmiles(mol) for mol in moltraindata]  
 
 descriptors = [[Descriptors.TPSA(mol), Descriptors.MolLogP(mol), Descriptors.NHOHCount(mol),
                 Descriptors.NumHAcceptors(mol), Descriptors.NumHDonors(mol), Descriptors.NumHeteroatoms(mol),
@@ -47,7 +47,7 @@ descriptors = np.asarray(descriptors)
 fptraindata = [AllChem.GetMorganFingerprintAsBitVect(mol, 3) for mol in moltraindata]
 xtraindata = np.array(fptraindata)
 xtraindata = np.concatenate((xtraindata, descriptors),
-                            axis=1)  # build x training data from fingerprints and some descriptors
+                            axis=1)  
 ```
 
 Now the final test data is loaded in the same way as the training data and after training the model, their classes will be inferred. These could be the predictions for new molecules, one is interested in examining in the future.
@@ -72,12 +72,12 @@ testdescriptors = np.asarray(testdescriptors)
 
 testfptraindata = [AllChem.GetMorganFingerprintAsBitVect(mol, 3) for mol in moltestdata]
 x_final_test = np.array(testfptraindata)
-x_final_test = np.concatenate((x_final_test, testdescriptors), axis=1)  # get x test data ready
+x_final_test = np.concatenate((x_final_test, testdescriptors), axis=1)  
 ```
 
 Here one can take a quick look at the data balance to decide how to proceed further. In this case the data is significantly unbalanced.
 ```
-print("ratio: " + str(sum(ytraindata) / len(ytraindata)))  # take a look at the data balance
+print("ratio: " + str(sum(ytraindata) / len(ytraindata)))  
 ```
 
 The training data is split into the actual training set and a test set. The test set will later be used in addition to validation to test the generality of the model. A 10-fold stratified cross-validation is chosen, the training data is randomly oversampled to restore balance and the training data is scaled to unit variance (after the mean is removed). The scale is stored for later use. Note that the scaling is not required in this case, since we are working with a random forest model. However, for other models this preprocessing step is important.
@@ -85,13 +85,13 @@ The training data is split into the actual training set and a test set. The test
 randomseed = 789 # Working with a seed for the random numbers is useful to reproduce results during implementation, but should not affect the overall quality of the model.
 
 x_train, x_test, y_train, y_test = train_test_split(xtraindata, ytraindata, test_size=0.25, random_state=randomseed,
-                                                    stratify=ytraindata)  # keep 25 % for self-validation
-cv = StratifiedKFold(n_splits=10, random_state=randomseed)  # use stratified 10-fold cross validation
+                                                    stratify=ytraindata)  
+cv = StratifiedKFold(n_splits=10, random_state=randomseed) 
 
 ros = RandomOverSampler(random_state=randomseed)
-x_train, y_train = ros.fit_sample(x_train, y_train)  # oversample positive samples to accomplish data balance
+x_train, y_train = ros.fit_sample(x_train, y_train) 
 
-scaler = StandardScaler().fit(x_train)  # scale data (not very helpful here, but useful for other models)
+scaler = StandardScaler().fit(x_train)  
 x_train = scaler.transform(x_train)
 joblib.dump(scaler, "mydata/scale_morgan1.pkl", compress=3)
 ```
@@ -102,7 +102,7 @@ paramgrid = {
     "max_features": [x_train.shape[1] // 20, x_train.shape[1] // 15, x_train.shape[1] // 10, x_train.shape[1] // 5],
     "n_estimators": [100, 150, 250, 400]}
 m_rf = GridSearchCV(RandomForestClassifier(), paramgrid, n_jobs=2, cv=cv, verbose=1,
-                    scoring="accuracy")  # test rf for a grid of params
+                    scoring="accuracy") 
 m_rf.fit(x_train, y_train)
 joblib.dump(m_rf, "mydata/model_morgan1_rf.pkl", compress=3)
 ```
@@ -137,11 +137,11 @@ print("testratio: " + str(sum(pred_rf_test) / len(pred_rf_test)))
 
 In the last step, the predictions are brought to the same format as the training data and is written to a file.
 ```
-moltmp = np.array(testdata)  # get results ready
+moltmp = np.array(testdata)
 pred_rf_test = np.concatenate(([moltmp[1:, 0]], pred_rf_test[:, None].T), axis=0)
 pred_rf_test = np.concatenate(([moltmp[0, :], ["Label"]], pred_rf_test[:, :]), axis=1)
 
 with open("data/bbb_test_answers.csv", 'w', newline='') as resultFile:
     wr = csv.writer(resultFile)
-    wr.writerows(pred_rf_test.T)  # write results
+    wr.writerows(pred_rf_test.T)
 ```
