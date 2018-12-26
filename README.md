@@ -1,5 +1,5 @@
 # QSAR: Predicting Blood-Brain Barrier Passage
-This is an example of a quantitative structure-activity relationship (QSAR) model. It is build to predict the probability of a substance being able to pass the blood-brain barrier (BBB) using Morgan fingerprints and a number of hand-picked descriptors. The input consists of molecular structures in SMILES format and a random forest is used as a binary classification model. The best hyperparameters are determined by a grid search and the model is validated using 10-fold cross-validation. In the end it is tested on a separate set and used to infer the behavior of unlabeled data.
+This is an example of a quantitative structure-activity relationship (QSAR) model. It is build to predict the probability of a substance being able to pass the blood-brain barrier (BBB) using Morgan fingerprints and a number of hand-picked descriptors. The input consists of molecular structures in SMILES format and a random forest classifier is used as a binary classification model. The best hyperparameters are determined by a grid search and the model is validated using 10-fold cross-validation. In the end it is tested on a separate set and used to infer the behavior of unlabeled data.
 
 ## Implementation
 Numpy is used for handling the data arrays, rdkit for generating the fingerprints as input for the models and sklearn for implementing the models. csv is used to read the SMILES strings from the data files and imblearn offers a simple way to restore the class balance (in this case using random oversampling).
@@ -51,7 +51,7 @@ xtraindata = np.concatenate((xtraindata, descriptors),
                             axis=1)  
 ```
 
-Now the final test data is loaded in the same way as the training data and after training the model, their classes will be inferred. These could be the predictions for new molecules, one is interested in examining in the future.
+Now the final test data is loaded in the same way as the training data and after training the model, their classes will be inferred. These could be the predictions for new molecules one is interested in examining in the future.
 ```
 with open('data/bbb_test.csv', newline='') as csvfile:
     moltest = csv.reader(csvfile, delimiter=',')
@@ -76,7 +76,7 @@ x_final_test = np.array(testfptraindata)
 x_final_test = np.concatenate((x_final_test, testdescriptors), axis=1)  
 ```
 
-Here one can take a quick look at the data balance to decide how to proceed further. In this case the data is significantly unbalanced.
+Here you can take a quick look at the data balance to decide how to proceed further. In this case the data is significantly unbalanced.
 ```
 print("ratio: " + str(sum(ytraindata) / len(ytraindata)))  
 ```
